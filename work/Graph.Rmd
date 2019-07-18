@@ -1,0 +1,72 @@
+---
+title: "Graph"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## 1.기본 세팅
+```{r initial settings}
+rm(list=ls())
+setwd("c:/Users/user/Documents/2019IO/data")
+
+# 라이브러리 로딩
+packages = c('tidyverse', 'openxlsx' )
+lapply(packages, require, character.only = T)
+
+# 데이터 로딩, 한국은행 홈페이지 2015년 기준년 산업연관표 작성결과 통계요약표의 부가가치계수 sheet를 csv파일로 저장하여 이용 
+add_value_tab <- read.csv('add_value_tab.csv', header = T, stringsAsFactors = F)
+
+```
+
+## 2.데이터 정리
+```{r data_cleansing}
+
+# 데이터 개관
+head(add_value_tab)
+dim(add_value_tab)
+colnames(add_value_tab)
+
+# column 이름 변경
+
+# 'X.','X','X.1' column을 통합하여 sector column을 생성
+
+add_value_tab <- add_value_tab %>% unite(col = 'sector', X.,X,X.1, sep = "")  
+head(add_value_tab)
+
+# NA포함 column, 차이 변수 column을 제외하고 sector, 연도 column만을 선택 
+
+add_value_tab <- add_value_tab %>% select(sector, starts_with('X20'))
+head(add_value_tab)
+
+# 연도 column의 이름 변경 
+
+add_value_tab <- add_value_tab %>% rename('2000년' = X2000년.A.,
+                                          '2005년' = X2005년.B.,
+                                          '2010년' = X2010년.C.,
+                                          '2015년' = X2015년.D.)
+head(add_value_tab)
+
+# 각주 행 삭제
+add_value_tab <- add_value_tab[c(-45 : -48), ]
+
+# sector column 산업 분류명 다듬기
+add_value_tab$sector <- gsub('[?]', '', add_value_tab$sector) # gsub function은 특정 문자열을 찾아 바꾸는 함수
+add_value_tab$sector <- gsub('2)', '', add_value_tab$sector)
+add_value_tab$sector <- gsub('3)', '', add_value_tab$sector)
+head(add_value_tab)
+# 주요 산업 부분만 추리기
+add_value_tab_major <- add_value_tab[c(1, 5, 10, 11, 16, 18, 41), ]
+```
+
+
+## 그래프 그리기
+```{r plotting}
+ggplot(data = add_value_tab_major) +
+  geom_point(mapping = aes(x = add_value_tab_major$'2010년', y = add_value_tab_major$'2015년', color = sector)) +
+  xlab('2010년') + ylab('2015년') + coord_cartesian(xlim = c(0.4, 1), ylim = c(0.4, 1)) +
+  geom_abline(intercept = 0, slope = 1, color = 'grey', size = 0.4, linetype = 'dashed')
+```
