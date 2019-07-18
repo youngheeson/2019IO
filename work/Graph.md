@@ -6,7 +6,7 @@ Graph
 
 ``` r
 rm(list=ls())
-setwd("c:/Users/user/Documents/2019IO/data")
+setwd("c:/Users/user/Documents/2019IO")
 
 # 라이브러리 로딩
 packages = c('tidyverse', 'openxlsx' )
@@ -42,7 +42,7 @@ lapply(packages, require, character.only = T)
 
 ``` r
 # 데이터 로딩, 한국은행 홈페이지 2015년 기준년 산업연관표 작성결과 통계요약표의 부가가치계수 sheet를 csv파일로 저장하여 이용 
-add_value_tab <- read.csv('add_value_tab.csv', header = T, stringsAsFactors = F)
+add_value_tab <- read.csv('c:/Users/user/Documents/2019IO/data/add_value_tab.csv', header = T, stringsAsFactors = F)
 ```
 
 2.데이터 정리
